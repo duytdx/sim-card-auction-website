@@ -25,7 +25,7 @@
 ### Tech Stack  
 - [ASP.NET Core 9](https://dotnet.microsoft.com/en-us/apps/aspnet/) - A free, cross-platform and open-source web-development framework.
 - [Entity Framework Core 9](https://learn.microsoft.com/en-us/ef/core/) - An open source object–relational mapping framework.
-- [Microsoft SQL Server](https://hub.docker.com/_/microsoft-mssql-server) - A relational database management system.
+- [MySQL 8.0](https://hub.docker.com/_/mysql) - A relational database management system.
 - [SignalR](https://dotnet.microsoft.com/en-us/apps/aspnet/signalr) - A library that enables real-time communication between servers and clients.
 - [ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity) - A membership system for managing users, authentication, and authorization in ASP.NET Core applications.
 - [JWT](https://jwt.io/) - A secure, compact token format used for transmitting information between parties as a JSON object.
@@ -269,10 +269,10 @@ cd BidX-API
 ### 2. Configure Environment Variables  
 - Rename the example files:  
   - `webapi.env.example` → `webapi.env`  
-  - `sqlserver.env.example` → `sqlserver.env`  
+  - `mysql.env.example` → `mysql.env`  
 - Update the `.env` files with your credentials:  
   - `webapi.env`: Add database connection strings, JWT secret, and third-party API keys.  
-  - `sqlserver.env`: Set the SQL Server admin password.  
+  - `mysql.env`: Set the MySQL root password, database name, and user credentials.  
 
 ### 3. Edit [`appsettings.json`](src/BidX.Presentation/appsettings.json)  
 Update the following attributes in `appsettings.json` as needed:  

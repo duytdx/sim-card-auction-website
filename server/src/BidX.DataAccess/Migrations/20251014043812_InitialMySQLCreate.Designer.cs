@@ -3,7 +3,6 @@ using System;
 using BidX.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -12,26 +11,22 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BidX.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250115233932_Merge Product into Auction entity and add IsAccepted property to Bid entity and add proper indexes")]
-    partial class MergeProductintoAuctionentityandaddIsAcceptedpropertytoBidentityandaddproperindexes
+    [Migration("20251014043812_InitialMySQLCreate")]
+    partial class InitialMySQLCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("BidX.DataAccess.Entites.Auction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AuctioneerId")
                         .HasColumnType("int");
@@ -43,7 +38,7 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("EndTime")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime");
 
                     b.Property<decimal>("MinBidIncrement")
                         .HasPrecision(18)
@@ -51,18 +46,18 @@ namespace BidX.DataAccess.Migrations
 
                     b.Property<string>("ProductCondition")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ProductDescription")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("StartTime")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime");
 
                     b.Property<decimal>("StartingPrice")
                         .HasPrecision(18)
@@ -70,7 +65,7 @@ namespace BidX.DataAccess.Migrations
 
                     b.Property<string>("ThumbnailUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("WinnerId")
                         .HasColumnType("int");
@@ -99,8 +94,6 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<decimal>("Amount")
                         .HasPrecision(18)
                         .HasColumnType("decimal(18,0)");
@@ -112,16 +105,16 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<bool>("IsAccepted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset>("PlacedAt")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BidderId");
 
-                    b.HasIndex("AuctionId", "Amount")
+                    b.HasIndex("AuctionId", "Amount", "IsAccepted")
                         .IsDescending();
 
                     b.ToTable("Bid");
@@ -133,18 +126,16 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("IconUrl")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -157,9 +148,26 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int?>("LastMessageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Participant1Id")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Participant2Id")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LastMessageId")
+                        .IsUnique();
+
+                    b.HasIndex("Participant1Id");
+
+                    b.HasIndex("Participant2Id");
 
                     b.ToTable("Chat");
                 });
@@ -170,11 +178,9 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -187,45 +193,139 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
-                    b.Property<bool>("Seen")
-                        .HasColumnType("bit");
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("RecipientId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SenderId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChatId");
+                    b.HasIndex("RecipientId");
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Message");
+                    b.HasIndex("ChatId", "RecipientId", "IsRead");
+
+                    b.ToTable("Message", t =>
+                        {
+                            t.HasTrigger("last_message_trigger");
+                        });
+                });
+
+            modelBuilder.Entity("BidX.DataAccess.Entites.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("IssuerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("RedirectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RedirectTo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IssuerId");
+
+                    b.ToTable("Notification");
+                });
+
+            modelBuilder.Entity("BidX.DataAccess.Entites.NotificationRecipient", b =>
+                {
+                    b.Property<int>("RecipientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NotificationId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("RecipientId", "NotificationId");
+
+                    b.HasIndex("NotificationId");
+
+                    b.HasIndex("RecipientId", "EventId")
+                        .IsUnique();
+
+                    b.ToTable("NotificationRecipient");
+                });
+
+            modelBuilder.Entity("BidX.DataAccess.Entites.OutboxMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTimeOffset?>("ProcessedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedAt", "ProcessedAt")
+                        .HasFilter("[ProcessedAt] IS NULL");
+
+                    b.ToTable("OutboxMessage");
                 });
 
             modelBuilder.Entity("BidX.DataAccess.Entites.ProductImage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("AuctionId")
                         .HasColumnType("int");
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -240,13 +340,11 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime");
 
                     b.Property<decimal>("Rating")
                         .HasPrecision(2, 1)
@@ -258,8 +356,8 @@ namespace BidX.DataAccess.Migrations
                     b.Property<int>("ReviewerId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime");
 
                     b.HasKey("Id");
 
@@ -267,7 +365,10 @@ namespace BidX.DataAccess.Migrations
 
                     b.HasIndex("ReviewerId");
 
-                    b.ToTable("Review");
+                    b.ToTable("Review", t =>
+                        {
+                            t.HasTrigger("average_rating_trigger");
+                        });
                 });
 
             modelBuilder.Entity("BidX.DataAccess.Entites.User", b =>
@@ -276,75 +377,79 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsOnline")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("ProfilePictureUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("TotalRating")
+                    b.Property<decimal>("AverageRating")
                         .HasPrecision(2, 1)
                         .HasColumnType("decimal(2,1)");
 
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("longtext")
+                        .HasComputedColumnSql("CONCAT(`FirstName`, ' ', `LastName`)", true);
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("longtext");
+
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
@@ -353,27 +458,11 @@ namespace BidX.DataAccess.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.HasIndex("RefreshToken");
 
-                    b.ToTable("User", "security");
-                });
-
-            modelBuilder.Entity("BidX.DataAccess.Entites.UserChat", b =>
-                {
-                    b.Property<int>("ChatId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ChatId", "UserId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserChat");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -382,28 +471,25 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("Role", "security");
+                    b.ToTable("Role", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -412,13 +498,11 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -427,7 +511,7 @@ namespace BidX.DataAccess.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("RoleClaim", "security");
+                    b.ToTable("RoleClaim", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
@@ -436,13 +520,11 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -451,19 +533,19 @@ namespace BidX.DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserClaim", "security");
+                    b.ToTable("UserClaim", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -472,7 +554,7 @@ namespace BidX.DataAccess.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserLogin", "security");
+                    b.ToTable("UserLogin", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
@@ -487,7 +569,7 @@ namespace BidX.DataAccess.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRole", "security");
+                    b.ToTable("UserRole", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
@@ -496,17 +578,17 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UserToken", "security");
+                    b.ToTable("UserToken", (string)null);
                 });
 
             modelBuilder.Entity("BidX.DataAccess.Entites.Auction", b =>
@@ -514,19 +596,16 @@ namespace BidX.DataAccess.Migrations
                     b.HasOne("BidX.DataAccess.Entites.User", "Auctioneer")
                         .WithMany()
                         .HasForeignKey("AuctioneerId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BidX.DataAccess.Entites.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BidX.DataAccess.Entites.City", "City")
                         .WithMany()
                         .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BidX.DataAccess.Entites.User", "Winner")
@@ -560,44 +639,105 @@ namespace BidX.DataAccess.Migrations
                     b.Navigation("Bidder");
                 });
 
+            modelBuilder.Entity("BidX.DataAccess.Entites.Chat", b =>
+                {
+                    b.HasOne("BidX.DataAccess.Entites.Message", "LastMessage")
+                        .WithOne()
+                        .HasForeignKey("BidX.DataAccess.Entites.Chat", "LastMessageId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("BidX.DataAccess.Entites.User", "Participant1")
+                        .WithMany()
+                        .HasForeignKey("Participant1Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BidX.DataAccess.Entites.User", "Participant2")
+                        .WithMany()
+                        .HasForeignKey("Participant2Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("LastMessage");
+
+                    b.Navigation("Participant1");
+
+                    b.Navigation("Participant2");
+                });
+
             modelBuilder.Entity("BidX.DataAccess.Entites.Message", b =>
                 {
                     b.HasOne("BidX.DataAccess.Entites.Chat", "Chat")
                         .WithMany("Messages")
                         .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("BidX.DataAccess.Entites.User", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BidX.DataAccess.Entites.User", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Chat");
 
+                    b.Navigation("Recipient");
+
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("BidX.DataAccess.Entites.Notification", b =>
+                {
+                    b.HasOne("BidX.DataAccess.Entites.User", "Issuer")
+                        .WithMany()
+                        .HasForeignKey("IssuerId")
+                        .IsRequired();
+
+                    b.Navigation("Issuer");
+                });
+
+            modelBuilder.Entity("BidX.DataAccess.Entites.NotificationRecipient", b =>
+                {
+                    b.HasOne("BidX.DataAccess.Entites.Notification", "Notification")
+                        .WithMany("NotificationRecipients")
+                        .HasForeignKey("NotificationId")
+                        .IsRequired();
+
+                    b.HasOne("BidX.DataAccess.Entites.User", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .IsRequired();
+
+                    b.Navigation("Notification");
+
+                    b.Navigation("Recipient");
                 });
 
             modelBuilder.Entity("BidX.DataAccess.Entites.ProductImage", b =>
                 {
-                    b.HasOne("BidX.DataAccess.Entites.Auction", "Auction")
+                    b.HasOne("BidX.DataAccess.Entites.Auction", null)
                         .WithMany("ProductImages")
                         .HasForeignKey("AuctionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Auction");
                 });
 
             modelBuilder.Entity("BidX.DataAccess.Entites.Review", b =>
                 {
                     b.HasOne("BidX.DataAccess.Entites.User", "Reviewee")
-                        .WithMany("ReviewsReceived")
+                        .WithMany()
                         .HasForeignKey("RevieweeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("BidX.DataAccess.Entites.User", "Reviewer")
-                        .WithMany("ReviewsWritten")
+                        .WithMany()
                         .HasForeignKey("ReviewerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -607,31 +747,11 @@ namespace BidX.DataAccess.Migrations
                     b.Navigation("Reviewer");
                 });
 
-            modelBuilder.Entity("BidX.DataAccess.Entites.UserChat", b =>
-                {
-                    b.HasOne("BidX.DataAccess.Entites.Chat", "Chat")
-                        .WithMany()
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BidX.DataAccess.Entites.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chat");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -640,7 +760,6 @@ namespace BidX.DataAccess.Migrations
                     b.HasOne("BidX.DataAccess.Entites.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -649,7 +768,6 @@ namespace BidX.DataAccess.Migrations
                     b.HasOne("BidX.DataAccess.Entites.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -658,13 +776,11 @@ namespace BidX.DataAccess.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BidX.DataAccess.Entites.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -673,7 +789,6 @@ namespace BidX.DataAccess.Migrations
                     b.HasOne("BidX.DataAccess.Entites.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -689,11 +804,9 @@ namespace BidX.DataAccess.Migrations
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("BidX.DataAccess.Entites.User", b =>
+            modelBuilder.Entity("BidX.DataAccess.Entites.Notification", b =>
                 {
-                    b.Navigation("ReviewsReceived");
-
-                    b.Navigation("ReviewsWritten");
+                    b.Navigation("NotificationRecipients");
                 });
 #pragma warning restore 612, 618
         }

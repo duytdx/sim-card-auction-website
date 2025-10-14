@@ -2,7 +2,7 @@
 import { useAuthStore } from "@/stores/AuthStore";
 import { ref } from "vue";
 import ErrorBox from "../Shared/ErrorBox.vue";
-import ContinueWithGoogleButton from "../Shared/ContinueWithGoogleButton.vue";
+// import ContinueWithGoogleButton from "../Shared/ContinueWithGoogleButton.vue"; // Disabled Google OAuth
 
 const emit = defineEmits(["registerDone"]);
 
@@ -132,8 +132,9 @@ const register = async (event) => {
       />
     </VForm>
 
-    <VDivider opacity="0.3" class="my-5">OR</VDivider>
-    <ContinueWithGoogleButton @error="(error) => (form.error = error)" />
+    <!-- Google OAuth disabled -->
+    <!-- <VDivider opacity="0.3" class="my-5">OR</VDivider>
+    <ContinueWithGoogleButton @error="(error) => (form.error = error)" /> -->
 
     <!--Login Link-->
     <div class="text-center text-caption mt-2">

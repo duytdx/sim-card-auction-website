@@ -8,6 +8,6 @@ public class UserClaimConfig : IEntityTypeConfiguration<IdentityUserClaim<int>>
 {
     public void Configure(EntityTypeBuilder<IdentityUserClaim<int>> builder)
     {
-        builder.ToTable("UserClaim", "security");
+        builder.ToTable("UserClaim");
     }
 }

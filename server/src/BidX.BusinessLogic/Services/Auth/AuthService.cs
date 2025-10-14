@@ -30,6 +30,8 @@ public class AuthService : IAuthService
     public async Task<Result> Register(RegisterRequest request, string userRole = "User")
     {
         var user = request.ToUserEntity();
+        // Auto-confirm email for testing (since email service is disabled)
+        user.EmailConfirmed = true;
 
         var creationResult = await userManager.CreateAsync(user, request.Password);
         if (!creationResult.Succeeded)
@@ -45,26 +47,26 @@ public class AuthService : IAuthService
             throw new Exception($"Faild to add roles while registering the user whose email is: {request.Email}."); // will be catched and logged by the global error handler middleware
         }
 
-        await SendConfirmationEmail(user.Email!);
+        // Temporarily disabled email confirmation for testing
+        // await SendConfirmationEmail(user.Email!);
 
         return Result.Success();
     }
 
     public async Task SendConfirmationEmail(string email)
     {
-        var user = await userManager.FindByEmailAsync(email);
-
-        if (user != null && !user.EmailConfirmed)
-        {
-            var emailConfirmationPageUrl = configuration["AuthPages:EmailConfirmationPageUrl"];
-
-            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-
-            var confirmationLink = $"{emailConfirmationPageUrl}?userId={user.Id}&token={token}";
-
-            await emailService.SendConfirmationEmail(email, confirmationLink);
-        }
+        // Email confirmation completely disabled - do nothing
+        await Task.CompletedTask;
+        
+        // var user = await userManager.FindByEmailAsync(email);
+        // if (user != null && !user.EmailConfirmed)
+        // {
+        //     var emailConfirmationPageUrl = configuration["AuthPages:EmailConfirmationPageUrl"];
+        //     var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        //     token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+        //     var confirmationLink = $"{emailConfirmationPageUrl}?userId={user.Id}&token={token}";
+        //     await emailService.SendConfirmationEmail(email, confirmationLink);
+        // }
     }
 
     public async Task<Result<LoginResponse>> ConfirmEmail(ConfirmEmailRequest request)
@@ -74,21 +76,23 @@ public class AuthService : IAuthService
         if (user == null)
             return Result<LoginResponse>.Failure(ErrorCode.RESOURCE_NOT_FOUND, ["User not found."]);
 
-        if (!user.EmailConfirmed)
-        {
-            var token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
-
-            var result = await userManager.ConfirmEmailAsync(user, token);
-            if (!result.Succeeded)
-            {
-                var errorMessages = result.Errors.Select(error => error.Description);
-                return Result<LoginResponse>.Failure(ErrorCode.AUTH_EMAIL_CONFIRMATION_FAILD, errorMessages);
-            }
-
-            return Result<LoginResponse>.Success(await GenerateAuthResponse(user));
-        }
-
-        return Result<LoginResponse>.Failure(ErrorCode.AUTH_EMAIL_CONFIRMATION_FAILD, ["Email is Already Confirmed."]);
+        // Email confirmation completely disabled - auto confirm and login
+        user.EmailConfirmed = true;
+        await userManager.UpdateAsync(user);
+        return Result<LoginResponse>.Success(await GenerateAuthResponse(user));
+        
+        // if (!user.EmailConfirmed)
+        // {
+        //     var token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
+        //     var result = await userManager.ConfirmEmailAsync(user, token);
+        //     if (!result.Succeeded)
+        //     {
+        //         var errorMessages = result.Errors.Select(error => error.Description);
+        //         return Result<LoginResponse>.Failure(ErrorCode.AUTH_EMAIL_CONFIRMATION_FAILD, errorMessages);
+        //     }
+        //     return Result<LoginResponse>.Success(await GenerateAuthResponse(user));
+        // }
+        // return Result<LoginResponse>.Failure(ErrorCode.AUTH_EMAIL_CONFIRMATION_FAILD, ["Email is Already Confirmed."]);
     }
 
     public async Task<Result<LoginResponse>> Login(LoginRequest request)
@@ -118,12 +122,13 @@ public class AuthService : IAuthService
                 ["Invalid email or password."]);
         }
 
-        if (!user.EmailConfirmed)
-        {
-            return Result<LoginResponse>.Failure(
-                ErrorCode.AUTH_EMAIL_NOT_CONFIRMED,
-                ["The email has not been confirmed."]);
-        }
+        // Email confirmation completely disabled
+        // if (!user.EmailConfirmed)
+        // {
+        //     return Result<LoginResponse>.Failure(
+        //         ErrorCode.AUTH_EMAIL_NOT_CONFIRMED,
+        //         ["The email has not been confirmed."]);
+        // }
 
         await userManager.ResetAccessFailedCountAsync(user);
 
@@ -168,7 +173,7 @@ public class AuthService : IAuthService
     {
         var user = await userManager.FindByEmailAsync(email);
 
-        if (user != null && user.EmailConfirmed)
+        if (user != null) // Removed EmailConfirmed check
         {
             var resetPasswordPageUrl = configuration["AuthPages:ResetPasswordPageUrl"];
 
@@ -185,7 +190,7 @@ public class AuthService : IAuthService
     {
         var user = await userManager.FindByIdAsync(request.UserId);
 
-        if (user != null && user.EmailConfirmed)
+        if (user != null) // Removed EmailConfirmed check
         {
             request.Token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
 

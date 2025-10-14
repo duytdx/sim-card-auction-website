@@ -9,21 +9,21 @@ services:
     ports:
       - 5000:8080
     depends_on:
-      - sqlserver
+      - mysql
     volumes:
       - webapi-logs:/app/Logs
       - dataprotection-keys:/root/.aspnet/DataProtection-Keys
     
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqlserver
-    env_file: sqlserver.env
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    env_file: mysql.env
     ports:
-      - 1433:1433
+      - 3306:3306
     volumes:
-      - sqlserver-data:/var/opt/mssql
+      - mysql-data:/var/lib/mysql
 
 volumes:
   webapi-logs:
-  sqlserver-data:
+  mysql-data:
   dataprotection-keys: # For DataProtection keys otherwise I will got a warning that the keys will be unavailable when the container is destroyed see:https://andrewlock.net/an-introduction-to-the-data-protection-system-in-asp-net-core

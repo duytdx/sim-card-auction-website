@@ -28,11 +28,11 @@ public class ChatConfig : IEntityTypeConfiguration<Chat>
         //  - Filtering by (Participant1Id == userId || Participant2Id == userId)
         // Without these 2 indexes the db will do a full scan but by adding them it will:
         //  - Seek participant1Id index --> Seek participant2Id index --> Combines the results
-        builder.HasIndex(c => c.Participant1Id)
-            .IncludeProperties(c => new { c.Participant2Id, c.LastMessageId }); // To make the index a "Covering Index" otherwise the optimizer may ignore it and do a full scan
+        builder.HasIndex(c => c.Participant1Id);
+            // .IncludeProperties(c => new { c.Participant2Id, c.LastMessageId }); // To make the index a "Covering Index" - Not supported in EF Core 8.0
 
-        builder.HasIndex(c => c.Participant2Id)
-            .IncludeProperties(c => new { c.Participant1Id, c.LastMessageId });
+        builder.HasIndex(c => c.Participant2Id);
+            // .IncludeProperties(c => new { c.Participant1Id, c.LastMessageId }); // Not supported in EF Core 8.0
 
     }
 

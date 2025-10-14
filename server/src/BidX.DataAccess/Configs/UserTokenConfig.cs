@@ -8,6 +8,6 @@ public class UserTokenConfig : IEntityTypeConfiguration<IdentityUserToken<int>>
 {
     public void Configure(EntityTypeBuilder<IdentityUserToken<int>> builder)
     {
-        builder.ToTable("UserToken", "security");
+        builder.ToTable("UserToken");
     }
 }

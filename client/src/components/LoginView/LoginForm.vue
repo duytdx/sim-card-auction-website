@@ -4,9 +4,9 @@ import { useAuthStore } from "@/stores/AuthStore";
 import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ErrorBox from "../Shared/ErrorBox.vue";
-import ContinueWithGoogleButton from "../Shared/ContinueWithGoogleButton.vue";
+// import ContinueWithGoogleButton from "../Shared/ContinueWithGoogleButton.vue"; // Disabled Google OAuth
 
-const emit = defineEmits(["emailNotConfirmed"]);
+// const emit = defineEmits(["emailNotConfirmed"]); // Email confirmation disabled
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -50,9 +50,11 @@ const login = async (event) => {
 
     router.replace(route.query.redirect);
   } catch (errorResponse) {
-    errorResponse.errorCode === ErrorCode.AUTH_EMAIL_NOT_CONFIRMED
-      ? emit("emailNotConfirmed", credentials.value.email)
-      : (form.value.error = errorResponse);
+    // Email confirmation disabled
+    // errorResponse.errorCode === ErrorCode.AUTH_EMAIL_NOT_CONFIRMED
+    //   ? emit("emailNotConfirmed", credentials.value.email)
+    //   : (form.value.error = errorResponse);
+    form.value.error = errorResponse;
   } finally {
     form.value.loading = false;
   }
@@ -115,8 +117,9 @@ const login = async (event) => {
       />
     </VForm>
 
-    <VDivider opacity="0.3" class="my-5">OR</VDivider>
-    <ContinueWithGoogleButton @error="(error) => (form.error = error)" />
+    <!-- Google OAuth disabled -->
+    <!-- <VDivider opacity="0.3" class="my-5">OR</VDivider>
+    <ContinueWithGoogleButton @error="(error) => (form.error = error)" /> -->
 
     <!--Register Link-->
     <div class="text-center text-caption mt-2">

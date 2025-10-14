@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MySql.EntityFrameworkCore.Extensions;
 using Microsoft.OpenApi.Models;
 using Quartz;
 using Swashbuckle.AspNetCore.Filters;
@@ -92,7 +93,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAndConfigureDBContext(this IServiceCollection services)
     {
         services.AddDbContextFactory<AppDbContext>(options =>
-            options.UseSqlServer(Environment.GetEnvironmentVariable("BIDX_DB_CONNECTION_STRING")));
+            options.UseMySQL(Environment.GetEnvironmentVariable("BIDX_DB_CONNECTION_STRING")));
 
         return services;
     }
@@ -200,7 +201,7 @@ public static class ServiceCollectionExtensions
                 .WithIdentity($"{jobKey}Trigger")
                 .StartNow()
                 .WithSimpleSchedule(builder => builder
-                    .WithIntervalInSeconds(1)
+                    .WithIntervalInSeconds(30)
                     .RepeatForever())
                 );
         });
@@ -216,7 +217,8 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddScoped<IAuthProvider, GoogleAuthProvider>();
+        // Google OAuth disabled
+        // services.AddScoped<IAuthProvider, GoogleAuthProvider>();
         services.AddScoped<IAuthProviderFactory, AuthProviderFactory>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
