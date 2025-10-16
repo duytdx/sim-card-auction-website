@@ -11,15 +11,15 @@ export default {
     return response.data;
   },
 
-  // Google OAuth disabled
-  // async loginWithGoogle(idToken) {
-  //   const response = await httpClient.post(
-  //     "/auth/google-login",
-  //     { idToken: idToken },
-  //     { withCredentials: true }
-  //   );
-  //   return response.data;
-  // },
+  async loginWithGoogle(idToken) {
+    const response = await httpClient.post(
+      "/auth/google-login",
+      { idToken: idToken },
+      { withCredentials: true }
+    );
+
+    return response.data;
+  },
 
   async register(user) {
     await httpClient.post("/auth/register", user);

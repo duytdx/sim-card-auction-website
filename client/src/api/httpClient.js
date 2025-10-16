@@ -6,9 +6,19 @@ const httpClient = axios.create({
   baseURL: import.meta.env.VITE_BIDX_API_URL,
 });
 
+const apiPrefix = "/api";
+
 // Optionally add the Authorization header based on whether the request requires authentication
 httpClient.interceptors.request.use(
   (config) => {
+    if (config.url && !config.url.startsWith("http")) {
+      const hasLeadingSlash = config.url.startsWith("/");
+      const normalizedPath = hasLeadingSlash ? config.url : `/${config.url}`;
+      if (!normalizedPath.startsWith(`${apiPrefix}/`)) {
+        config.url = `${apiPrefix}${normalizedPath}`;
+      }
+    }
+
     const requiresAuth = config.requiresAuth; // Custom property to indicate if auth is required
     if (requiresAuth) addAuthHeader(config);
     return config;

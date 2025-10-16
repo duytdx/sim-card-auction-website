@@ -13,6 +13,7 @@ public static class UserMappingExtensions
             FirstName = request.FirstName,
             LastName = request.LastName,
             Email = request.Email,
+            EmailConfirmed = true,
             UserName = Guid.NewGuid().ToString() // because it needs a unique value and we dont want to ask user to enter it to make the register process easier, and if we set it to the email value it will give user 2 errors in case if the entered email is already taken, one for username and one for email
         };
     }

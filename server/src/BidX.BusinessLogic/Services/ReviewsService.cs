@@ -79,6 +79,8 @@ public class ReviewsService : IReviewsService
         var review = request.ToReviewEntity(reviewerId, revieweeId);
         appDbContext.Reviews.Add(review);
         await appDbContext.SaveChangesAsync();
+        
+        await UpdateAverageRating(revieweeId);
 
         var response = review.ToMyReviewResponse();
         return Result<MyReviewResponse>.Success(response);
@@ -101,6 +103,8 @@ public class ReviewsService : IReviewsService
 
             return Result.Failure(ErrorCode.RESOURCE_NOT_FOUND, ["You have not reviewed this user before."]);
         }
+        
+        await UpdateAverageRating(revieweeId);
 
         return Result.Success();
     }
@@ -119,6 +123,8 @@ public class ReviewsService : IReviewsService
 
             return Result.Failure(ErrorCode.RESOURCE_NOT_FOUND, ["You have not reviewed this user before."]);
         }
+        
+        await UpdateAverageRating(revieweeId);
 
         return Result.Success();
     }
@@ -148,5 +154,17 @@ public class ReviewsService : IReviewsService
             return Result.Failure(ErrorCode.REVIEW_ALREADY_EXISTS, ["You cannot review a user more than once."]);
 
         return Result.Success();
+    }
+    
+    private async Task UpdateAverageRating(int revieweeId)
+    {
+        var averageRating = await appDbContext.Reviews
+            .Where(r => r.RevieweeId == revieweeId)
+            .Select(r => (decimal?)r.Rating)
+            .AverageAsync() ?? 0m;
+
+        await appDbContext.Users
+            .Where(u => u.Id == revieweeId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(u => u.AverageRating, averageRating));
     }
 }

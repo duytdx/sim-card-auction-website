@@ -8,9 +8,7 @@ public class OutboxMessageConfig : IEntityTypeConfiguration<OutboxMessage>
 {
     public void Configure(EntityTypeBuilder<OutboxMessage> builder)
     {
-        builder.HasIndex(m => new { m.CreatedAt, m.ProcessedAt })
-            // .IncludeProperties(m => new { m.Id, m.Type, m.Content }) // Not supported in EF Core 8.0
-            .HasFilter("[ProcessedAt] IS NULL");
+        builder.HasIndex(m => new { m.CreatedAt, m.ProcessedAt });
     }
 
 }

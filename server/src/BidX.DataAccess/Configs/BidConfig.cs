@@ -15,8 +15,7 @@ public class BidConfig : IEntityTypeConfiguration<Bid>
         // Needed in GetHighestBid()
         // Needed in ProjectToAuctionResponse(), ProjectToAuctionDetailsResponse() and PlaceBid() for:
         //  - Calculating Auction CurruentPrice
-        builder.HasIndex(b => new { b.AuctionId, b.Amount, b.IsAccepted }) // IsAccepted is added to avoid key lookups while calculating CurrentPrice in case of ended auctions
-            .IsDescending();
+        builder.HasIndex(b => new { b.AuctionId, b.Amount, b.IsAccepted }); // Composite index optimizes bid lookups for current price calculations
     }
 
 }

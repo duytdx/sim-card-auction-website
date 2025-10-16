@@ -20,7 +20,12 @@ public static class AppDbInitializer
         var email = Environment.GetEnvironmentVariable("BIDX_ADMIN_EMAIL");
         var password = Environment.GetEnvironmentVariable("BIDX_ADMIN_PASSWORD");
 
-        if (await userManager.FindByEmailAsync(email!) == null)
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            return; // Skip seeding if admin credentials are not configured
+        }
+
+        if (await userManager.FindByEmailAsync(email) == null)
         {
             var admin = new User
             {

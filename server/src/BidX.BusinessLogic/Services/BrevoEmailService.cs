@@ -17,14 +17,6 @@ public class BrevoEmailService : IEmailService
         this.configuration = configuration;
     }
 
-    public async Task SendConfirmationEmail(string userEmail, string confirmationLink)
-    {
-        await SendTemplatedEmail(
-            userEmail,
-            configuration[$"BrevoEmailApi:ConfirmationEmailTemplateId"]!,
-            new { ConfirmationLink = confirmationLink });
-    }
-
     public async Task SendPasswordResetEmail(string userEmail, string passwordResetPageLink)
     {
         await SendTemplatedEmail(

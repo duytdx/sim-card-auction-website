@@ -111,6 +111,10 @@ public class ChatsService : IChatsService
         appDbContext.Messages.Add(message);
         await appDbContext.SaveChangesAsync();
 
+        await appDbContext.Chats
+            .Where(c => c.Id == message.ChatId)
+            .ExecuteUpdateAsync(setters => setters.SetProperty(c => c.LastMessageId, message.Id));
+
         // Send the message to the chat
         var response = message.ToMessageResponse();
         await Task.WhenAll(

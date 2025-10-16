@@ -6,9 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-// Load environment variables from webapi.env file
-LoadEnvironmentVariables();
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
@@ -38,7 +35,16 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var appDbContext = services.GetRequiredService<AppDbContext>();
-        await appDbContext.Database.MigrateAsync();
+        var database = appDbContext.Database;
+
+        if (database.ProviderName?.Contains("MySql", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            await database.EnsureCreatedAsync();
+        }
+        else
+        {
+            await database.MigrateAsync();
+        }
 
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<int>>>();
         await roleManager.SeedRoles();
@@ -73,42 +79,3 @@ app.MapControllers();
 app.MapHub<Hub>("/hub");
 
 app.Run();
-
-static void LoadEnvironmentVariables()
-{
-    // Try different paths to find the webapi.env file
-    var possiblePaths = new[]
-    {
-        Path.Combine(Directory.GetCurrentDirectory(), "..", "webapi.env"),
-        Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "webapi.env"),
-        Path.Combine(Directory.GetCurrentDirectory(), "webapi.env"),
-        @"D:\My Project\sim-card-auction-website\server\webapi.env"
-    };
-
-    string? envFilePath = null;
-    foreach (var path in possiblePaths)
-    {
-        if (File.Exists(path))
-        {
-            envFilePath = path;
-            break;
-        }
-    }
-
-    if (envFilePath != null)
-    {
-        foreach (var line in File.ReadAllLines(envFilePath))
-        {
-            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
-                continue;
-
-            var parts = line.Split('=', 2);
-            if (parts.Length == 2)
-            {
-                var key = parts[0].Trim();
-                var value = parts[1].Trim();
-                Environment.SetEnvironmentVariable(key, value);
-            }
-        }
-    }
-}

@@ -25,19 +25,19 @@
 ### Tech Stack  
 - [ASP.NET Core 9](https://dotnet.microsoft.com/en-us/apps/aspnet/) - A free, cross-platform and open-source web-development framework.
 - [Entity Framework Core 9](https://learn.microsoft.com/en-us/ef/core/) - An open source object–relational mapping framework.
-- [MySQL 8.0](https://hub.docker.com/_/mysql) - A relational database management system.
+- [MySQL 8](https://dev.mysql.com/) - A relational database management system.
 - [SignalR](https://dotnet.microsoft.com/en-us/apps/aspnet/signalr) - A library that enables real-time communication between servers and clients.
 - [ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity) - A membership system for managing users, authentication, and authorization in ASP.NET Core applications.
 - [JWT](https://jwt.io/) - A secure, compact token format used for transmitting information between parties as a JSON object.
 - [Serilog](https://serilog.net/) - A logging library that allows logging to various outputs like files, console, etc.
 - [MediatR](https://github.com/jbogard/MediatR) - A simple, unambitious mediator implementation in .NET for in-process messaging.
 - [Quartz.NET](https://www.quartz-scheduler.net/) - An open source job scheduling system for .NET.
-- [Docker](https://www.docker.com/) - A containerization platform for packaging applications and their dependencies.
 
 ### Third-Party Services
-- [Google Identity Services (OpenID Connect)](https://developers.google.com/identity) - An authentication solution enabling secure sign-in with Google using OpenID Connect and OAuth 2.0.  
-- [Cloudinary](https://cloudinary.com/) - A cloud-based service for file storage and image management. 
-- [Brevo](https://www.brevo.com/) - An email sending service.  
+
+- [Google Identity Services (OpenID Connect)](https://developers.google.com/identity) - An authentication solution enabling secure sign-in with Google using OpenID Connect and OAuth 2.0.
+- [Cloudinary](https://cloudinary.com/) - A cloud-based service for file storage and image management.
+- [Brevo](https://www.brevo.com/) - An email sending service.
 
 
 ## 🌐 REST API Documentation  
@@ -260,52 +260,48 @@ Here are some challenges I encountered during development and the solutions I im
 
 ## 🛠️ Setup & Run 
 ### 1. Prerequisites  
-- Install [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/install/).  
+- Install [.NET SDK 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0).  
+- Install [MySQL Server 8.0](https://dev.mysql.com/downloads/mysql/) and ensure the service is running.  
 - Clone the repository:  
 ```bash  
 git clone https://github.com/Youssef-Adell/BidX-API.git 
 cd BidX-API 
 ```
-### 2. Configure Environment Variables  
-- Rename the example files:  
-  - `webapi.env.example` → `webapi.env`  
-  - `mysql.env.example` → `mysql.env`  
-- Update the `.env` files with your credentials:  
-  - `webapi.env`: Add database connection strings, JWT secret, and third-party API keys.  
-  - `mysql.env`: Set the MySQL root password, database name, and user credentials.  
 
-### 3. Edit [`appsettings.json`](src/BidX.Presentation/appsettings.json)  
-Update the following attributes in `appsettings.json` as needed:  
+### 2. Configure Secrets  
+- Copy `webapi.env` and fill in your credentials (database connection string, JWT secret, third-party API keys).  
+- Export the values as environment variables **or** use `dotnet user-secrets` inside `src/BidX.Presentation` to keep them outside source control.  
+
+### 3. Update [`appsettings.json`](src/BidX.Presentation/appsettings.json)  
+Adjust the following entries for your environment:  
 ```json  
 "BrevoEmailApi": {
-  "ConfirmationEmailTemplateId": "3",
   "PasswordResetEmailTemplateId": "5"
 },
 "Cors": {
   "FrontendOrigin": "http://localhost:3000"
 },
 "AuthPages": {
-  "EmailConfirmationPageUrl": "http://localhost:3000/confirm-email",
   "ResetPasswordPageUrl": "http://localhost:3000/reset-password"
 }
 ```
 
-### 4. Start the Application  
-Run the following command to build and start the containers:  
-```bash  
-docker-compose up --build  
+### 4. Prepare the Database  
+
+- Create a MySQL database (e.g., `auctionzdb`) and ensure the configured user has full privileges.  
+- Run the API once (see the next step) so Entity Framework Core can generate the schema and seed initial data automatically.  
+
+### 5. Run the API  
+
+```powershell
+dotnet run --project BidX.Presentation/BidX.Presentation.csproj
 ```
 
-- The API will be available at http://localhost:5000.
-- SQL Server will be accessible at localhost:1433.
-
-> [!NOTE]
-> Database, logs, and DataProtection keys are stored in Docker volumes (sqlserver-data, webapi-logs, dataprotection-keys) to ensure data persistence and consistency across container restarts or rebuilds.
+- The API will be available at <http://localhost:5000> (HTTPS at <https://localhost:5001> by default).
+- Point the frontend to the same origin configured in `Cors:FrontendOrigin`.
 
 ## 🚀 Future Enhancements
-- #### Spam Bid Detection
-  - Implement mechanisms to detect and block spam bids, ensuring fair auctions.  
-- #### Image Moderation
-  - Add automated checks to block inappropriate or harmful images uploaded by users.  
-- #### Rate Limiting
-  - Apply rate limits to critical endpoints to prevent abuse and ensure system stability.
+
+- **Spam Bid Detection**: Implement mechanisms to detect and block spam bids, ensuring fair auctions.  
+- **Image Moderation**: Add automated checks to block inappropriate or harmful images uploaded by users.  
+- **Rate Limiting**: Apply rate limits to critical endpoints to prevent abuse and ensure system stability.  

@@ -6,8 +6,6 @@ namespace BidX.BusinessLogic.Interfaces;
 public interface IAuthService
 {
     Task<Result> Register(RegisterRequest request, string userRole = "User");
-    Task SendConfirmationEmail(string email);
-    Task<Result<LoginResponse>> ConfirmEmail(ConfirmEmailRequest request);
     Task<Result<LoginResponse>> Login(LoginRequest request);
     Task<Result<LoginResponse>> LoginWithExternalProvider(LoginWithExternalProviderRequest request);
     Task<Result<LoginResponse>> Refresh(string? refreshToken);

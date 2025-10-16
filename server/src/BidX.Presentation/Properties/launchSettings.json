@@ -16,7 +16,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5203",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "BIDX_DB_CONNECTION_STRING": "Server=localhost;Port=3306;Database=auctionzdb;User=root;Password=12345;TreatTinyAsBoolean=true;AllowUserVariables=true;",
+  "BIDX_JWT_SECRET_KEY": "local_dev_secret_key_change_me_make_it_32_bytes_long"
       }
     },
     "https": {
@@ -26,7 +28,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7116;http://localhost:5203",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "BIDX_DB_CONNECTION_STRING": "Server=localhost;Port=3306;Database=auctionzdb;User=root;Password=12345;TreatTinyAsBoolean=true;AllowUserVariables=true;",
+  "BIDX_JWT_SECRET_KEY": "local_dev_secret_key_change_me_make_it_32_bytes_long"
       }
     },
     "IIS Express": {

@@ -3,6 +3,7 @@ using System;
 using BidX.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -11,22 +12,26 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BidX.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251014043812_InitialMySQLCreate")]
-    partial class InitialMySQLCreate
+    [Migration("20251016090511_InitialMySql")]
+    partial class InitialMySql
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("BidX.DataAccess.Entites.Auction", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AuctioneerId")
                         .HasColumnType("int");
@@ -38,7 +43,7 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("EndTime")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("MinBidIncrement")
                         .HasPrecision(18)
@@ -57,7 +62,7 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("StartTime")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("StartingPrice")
                         .HasPrecision(18)
@@ -94,6 +99,8 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<decimal>("Amount")
                         .HasPrecision(18)
                         .HasColumnType("decimal(18,0)");
@@ -108,14 +115,13 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset>("PlacedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BidderId");
 
-                    b.HasIndex("AuctionId", "Amount", "IsAccepted")
-                        .IsDescending();
+                    b.HasIndex("AuctionId", "Amount", "IsAccepted");
 
                     b.ToTable("Bid");
                 });
@@ -125,6 +131,8 @@ namespace BidX.DataAccess.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("IconUrl")
                         .IsRequired()
@@ -148,8 +156,10 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("LastMessageId")
                         .HasColumnType("int");
@@ -178,6 +188,8 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -192,6 +204,8 @@ namespace BidX.DataAccess.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
@@ -210,7 +224,7 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("SentAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -232,8 +246,10 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("tinyint(1)");
@@ -294,13 +310,13 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Error")
                         .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset?>("ProcessedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -308,8 +324,7 @@ namespace BidX.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedAt", "ProcessedAt")
-                        .HasFilter("[ProcessedAt] IS NULL");
+                    b.HasIndex("CreatedAt", "ProcessedAt");
 
                     b.ToTable("OutboxMessage");
                 });
@@ -340,11 +355,13 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Comment")
                         .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Rating")
                         .HasPrecision(2, 1)
@@ -357,7 +374,7 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
@@ -376,6 +393,8 @@ namespace BidX.DataAccess.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -403,7 +422,7 @@ namespace BidX.DataAccess.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("longtext")
-                        .HasComputedColumnSql("CONCAT(`FirstName`, ' ', `LastName`)", true);
+                        .HasComputedColumnSql("concat_ws(' ', FirstName, LastName)", true);
 
                     b.Property<bool>("IsOnline")
                         .HasColumnType("tinyint(1)");
@@ -416,7 +435,7 @@ namespace BidX.DataAccess.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetime");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -471,6 +490,8 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
@@ -498,6 +519,8 @@ namespace BidX.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("ClaimType")
                         .HasColumnType("longtext");
 
@@ -519,6 +542,8 @@ namespace BidX.DataAccess.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("longtext");

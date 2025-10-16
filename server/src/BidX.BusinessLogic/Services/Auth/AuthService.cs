@@ -30,8 +30,6 @@ public class AuthService : IAuthService
     public async Task<Result> Register(RegisterRequest request, string userRole = "User")
     {
         var user = request.ToUserEntity();
-        // Auto-confirm email for testing (since email service is disabled)
-        user.EmailConfirmed = true;
 
         var creationResult = await userManager.CreateAsync(user, request.Password);
         if (!creationResult.Succeeded)
@@ -47,52 +45,7 @@ public class AuthService : IAuthService
             throw new Exception($"Faild to add roles while registering the user whose email is: {request.Email}."); // will be catched and logged by the global error handler middleware
         }
 
-        // Temporarily disabled email confirmation for testing
-        // await SendConfirmationEmail(user.Email!);
-
         return Result.Success();
-    }
-
-    public async Task SendConfirmationEmail(string email)
-    {
-        // Email confirmation completely disabled - do nothing
-        await Task.CompletedTask;
-        
-        // var user = await userManager.FindByEmailAsync(email);
-        // if (user != null && !user.EmailConfirmed)
-        // {
-        //     var emailConfirmationPageUrl = configuration["AuthPages:EmailConfirmationPageUrl"];
-        //     var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        //     token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-        //     var confirmationLink = $"{emailConfirmationPageUrl}?userId={user.Id}&token={token}";
-        //     await emailService.SendConfirmationEmail(email, confirmationLink);
-        // }
-    }
-
-    public async Task<Result<LoginResponse>> ConfirmEmail(ConfirmEmailRequest request)
-    {
-        var user = await userManager.FindByIdAsync($"{request.UserId}");
-
-        if (user == null)
-            return Result<LoginResponse>.Failure(ErrorCode.RESOURCE_NOT_FOUND, ["User not found."]);
-
-        // Email confirmation completely disabled - auto confirm and login
-        user.EmailConfirmed = true;
-        await userManager.UpdateAsync(user);
-        return Result<LoginResponse>.Success(await GenerateAuthResponse(user));
-        
-        // if (!user.EmailConfirmed)
-        // {
-        //     var token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
-        //     var result = await userManager.ConfirmEmailAsync(user, token);
-        //     if (!result.Succeeded)
-        //     {
-        //         var errorMessages = result.Errors.Select(error => error.Description);
-        //         return Result<LoginResponse>.Failure(ErrorCode.AUTH_EMAIL_CONFIRMATION_FAILD, errorMessages);
-        //     }
-        //     return Result<LoginResponse>.Success(await GenerateAuthResponse(user));
-        // }
-        // return Result<LoginResponse>.Failure(ErrorCode.AUTH_EMAIL_CONFIRMATION_FAILD, ["Email is Already Confirmed."]);
     }
 
     public async Task<Result<LoginResponse>> Login(LoginRequest request)
@@ -121,14 +74,6 @@ public class AuthService : IAuthService
                 ErrorCode.AUTH_INVALID_USERNAME_OR_PASSWORD,
                 ["Invalid email or password."]);
         }
-
-        // Email confirmation completely disabled
-        // if (!user.EmailConfirmed)
-        // {
-        //     return Result<LoginResponse>.Failure(
-        //         ErrorCode.AUTH_EMAIL_NOT_CONFIRMED,
-        //         ["The email has not been confirmed."]);
-        // }
 
         await userManager.ResetAccessFailedCountAsync(user);
 
@@ -173,39 +118,39 @@ public class AuthService : IAuthService
     {
         var user = await userManager.FindByEmailAsync(email);
 
-        if (user != null) // Removed EmailConfirmed check
-        {
-            var resetPasswordPageUrl = configuration["AuthPages:ResetPasswordPageUrl"];
+        if (user is null)
+            return;
 
-            var token = await userManager.GeneratePasswordResetTokenAsync(user);
-            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+        var resetPasswordPageUrl = configuration["AuthPages:ResetPasswordPageUrl"];
 
-            var urlOfResetPasswordPageForCurrentUser = $"{resetPasswordPageUrl}?userId={user.Id}&token={token}";
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            await emailService.SendPasswordResetEmail(email, urlOfResetPasswordPageForCurrentUser);
-        }
+        var urlOfResetPasswordPageForCurrentUser = $"{resetPasswordPageUrl}?userId={user.Id}&token={token}";
+
+        await emailService.SendPasswordResetEmail(email, urlOfResetPasswordPageForCurrentUser);
     }
 
     public async Task<Result> ResetPassword(ResetPasswordRequest request)
     {
         var user = await userManager.FindByIdAsync(request.UserId);
 
-        if (user != null) // Removed EmailConfirmed check
+        if (user == null)
         {
-            request.Token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
-
-            var resetResult = await userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
-
-            if (!resetResult.Succeeded)
-            {
-                var errorMessages = resetResult.Errors.Select(error => error.Description);
-                return Result.Failure(ErrorCode.AUTH_PASSWORD_RESET_FAILD, errorMessages);
-            }
-
-            return Result.Success();
+            return Result.Failure(ErrorCode.AUTH_PASSWORD_RESET_FAILD, ["Oops! Something went wrong."]);
         }
 
-        return Result.Failure(ErrorCode.AUTH_PASSWORD_RESET_FAILD, ["Oops! Something went wrong."]);
+        request.Token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Token));
+
+        var resetResult = await userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+
+        if (!resetResult.Succeeded)
+        {
+            var errorMessages = resetResult.Errors.Select(error => error.Description);
+            return Result.Failure(ErrorCode.AUTH_PASSWORD_RESET_FAILD, errorMessages);
+        }
+
+        return Result.Success();
     }
 
     public async Task<Result> ChangePassword(int userId, ChangePasswordRequest request)

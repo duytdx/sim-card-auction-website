@@ -14,8 +14,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using MySql.EntityFrameworkCore.Extensions;
 using Microsoft.OpenApi.Models;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Quartz;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -93,7 +93,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddAndConfigureDBContext(this IServiceCollection services)
     {
         services.AddDbContextFactory<AppDbContext>(options =>
-            options.UseMySQL(Environment.GetEnvironmentVariable("BIDX_DB_CONNECTION_STRING")));
+        {
+            var connectionString = Environment.GetEnvironmentVariable("BIDX_DB_CONNECTION_STRING")
+                ?? throw new InvalidOperationException("Missing BIDX_DB_CONNECTION_STRING environment variable.");
+
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        });
 
         return services;
     }
@@ -201,7 +206,7 @@ public static class ServiceCollectionExtensions
                 .WithIdentity($"{jobKey}Trigger")
                 .StartNow()
                 .WithSimpleSchedule(builder => builder
-                    .WithIntervalInSeconds(30)
+                    .WithIntervalInSeconds(1)
                     .RepeatForever())
                 );
         });
@@ -217,8 +222,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Google OAuth disabled
-        // services.AddScoped<IAuthProvider, GoogleAuthProvider>();
+        services.AddScoped<IAuthProvider, GoogleAuthProvider>();
         services.AddScoped<IAuthProviderFactory, AuthProviderFactory>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();

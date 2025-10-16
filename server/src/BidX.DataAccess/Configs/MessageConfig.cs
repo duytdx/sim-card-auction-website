@@ -8,8 +8,6 @@ public class MessageConfig : IEntityTypeConfiguration<Message>
 {
     public void Configure(EntityTypeBuilder<Message> builder)
     {
-        builder.ToTable(t => t.HasTrigger("last_message_trigger"));
-
         builder.HasOne(m => m.Chat)
             .WithMany(c => c.Messages)
             .HasForeignKey(m => m.ChatId)

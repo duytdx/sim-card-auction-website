@@ -1,12 +1,13 @@
 <script setup>
 import { useAuthStore } from "@/stores/AuthStore";
 import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import ErrorBox from "../Shared/ErrorBox.vue";
-// import ContinueWithGoogleButton from "../Shared/ContinueWithGoogleButton.vue"; // Disabled Google OAuth
-
-const emit = defineEmits(["registerDone"]);
+import ContinueWithGoogleButton from "../Shared/ContinueWithGoogleButton.vue";
 
 const authStore = useAuthStore();
+const router = useRouter();
+const route = useRoute();
 
 const user = ref({
   firstname: "",
@@ -47,7 +48,8 @@ const register = async (event) => {
     form.value.loading = true;
     form.value.error = null;
     await authStore.register(user.value);
-    emit("registerDone", user.value.email);
+    await authStore.login(user.value.email, user.value.password);
+    router.replace(route.query.redirect ?? "/");
   } catch (errorResponse) {
     form.value.error = errorResponse;
   } finally {
@@ -132,9 +134,8 @@ const register = async (event) => {
       />
     </VForm>
 
-    <!-- Google OAuth disabled -->
-    <!-- <VDivider opacity="0.3" class="my-5">OR</VDivider>
-    <ContinueWithGoogleButton @error="(error) => (form.error = error)" /> -->
+    <VDivider opacity="0.3" class="my-5">OR</VDivider>
+    <ContinueWithGoogleButton @error="(error) => (form.error = error)" />
 
     <!--Login Link-->
     <div class="text-center text-caption mt-2">
