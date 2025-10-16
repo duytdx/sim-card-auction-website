@@ -68,6 +68,8 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseCors("AllowFrontendDomain");
 
 app.UseAuthentication(); // Validates the Token came at the request's Authorization header then decode it and assign it to HttpContext.User
