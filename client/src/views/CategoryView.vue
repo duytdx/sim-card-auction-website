@@ -1,5 +1,5 @@
 <script setup>
-import { onBeforeMount, ref } from "vue";
+import { computed, onBeforeMount, ref } from "vue";
 import { useDisplay } from "vuetify";
 import { useRoute, useRouter } from "vue-router";
 import categoriesService from "@/api/services/categoriesService";
@@ -7,6 +7,7 @@ import useAuctionsManager from "@/composables/useAuctionsManager";
 import AuctionFiltersDialog from "@/components/Shared/AuctionFiltersDialog.vue";
 import AuctionsGrid from "@/components/Shared/AuctionsGrid.vue";
 import { ErrorCode } from "@/api/errorCodes";
+import { resolveFileUrl } from "@/utils/urlUtils";
 
 const { xs } = useDisplay();
 const route = useRoute();
@@ -16,6 +17,8 @@ const category = ref({
   name: null,
   iconUrl: null,
 });
+
+const categoryIcon = computed(() => resolveFileUrl(category.value.iconUrl));
 
 const {
   auctions,
@@ -52,7 +55,7 @@ onBeforeMount(async () => {
         <VIcon icon="mdi-chevron-left" />
       </RouterLink>
       <img
-        :src="category.iconUrl"
+        :src="categoryIcon"
         width="40px"
         height="40px"
         class="bg-surface pa-1 rounded"

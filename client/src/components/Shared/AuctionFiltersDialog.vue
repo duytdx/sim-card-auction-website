@@ -28,7 +28,10 @@ const form = reactive({
     { title: "All", value: false },
     { title: "Active", value: true },
   ],
-  productConditions: ["New", "Used"],
+  productConditions: [
+    { title: "Unactivated (New)", value: "New" },
+    { title: "Pre-owned (Used)", value: "Used" },
+  ],
   categories: computed(() => categoriesStore.categories),
   cities: computed(() => citiesStore.cities),
 });
@@ -74,7 +77,7 @@ onBeforeMount(async () => {
         <div class="d-flex ga-1 align-center mb-6">
           <VIcon icon="mdi-filter" size="small" class="text-high-emphasis" />
           <span class="text-subtitle-1 text-high-emphasis font-weight-bold">
-            Filter Auctions
+            Filter SIM Auctions
           </span>
           <VSpacer />
           <VBtn
@@ -98,7 +101,7 @@ onBeforeMount(async () => {
           />
           <VSelect
             v-model="selectedFilters.productCondition"
-            label="Product Condition"
+            label="SIM Condition"
             :items="form.productConditions"
             item-title="title"
             item-value="value"
@@ -110,7 +113,7 @@ onBeforeMount(async () => {
           <VSelect
             v-if="!hideCategoryFilter"
             v-model="selectedFilters.categoryId"
-            label="Category"
+            label="SIM Category"
             :items="form.categories"
             item-title="name"
             item-value="id"

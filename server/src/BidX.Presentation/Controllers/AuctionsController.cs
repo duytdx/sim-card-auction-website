@@ -53,7 +53,7 @@ public class AuctionsController : ControllerBase
     [ProducesResponseType(typeof(AuctionDetailsResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> CreateAuction([FromForm] CreateAuctionRequest request, [Required][Length(1, 10, ErrorMessage = "The ProductImages field is required and must has 1 item at least item and 10 items at max.")] IEnumerable<IFormFile> productImages)
+    public async Task<IActionResult> CreateAuction([FromForm] CreateAuctionRequest request, [Required][Length(1, 10, ErrorMessage = "You must upload between 1 and 10 images.")] IEnumerable<IFormFile> productImages)
     {
         var userId = User.GetUserId();
 

@@ -4,9 +4,16 @@ import { useAuctionStore } from "@/stores/AuctionStore";
 import { formatDate } from "@/utils/dateTimeUtils";
 import { useDisplay } from "vuetify";
 import AuctionCountdown from "./AuctionCountdown.vue";
+import { computed } from "vue";
+import { resolveFileUrl } from "@/utils/urlUtils";
 
 const { smAndDown, xs } = useDisplay();
 const auctionStore = useAuctionStore();
+
+const simImages = computed(() => {
+  const images = auctionStore.auction?.productImages ?? [];
+  return images.map((image) => resolveFileUrl(image));
+});
 </script>
 
 <template>
@@ -22,7 +29,7 @@ const auctionStore = useAuctionStore();
           cycle
         >
           <VCarouselItem
-            v-for="(image, i) in auctionStore.auction?.productImages"
+            v-for="(image, i) in simImages"
             :key="i"
             :src="image"
           />
@@ -53,15 +60,15 @@ const auctionStore = useAuctionStore();
 
           <!--Details-->
           <section class="mt-4">
-            <h2 class="text-subtitle-2 text-high-emphasis">Details</h2>
+            <h2 class="text-subtitle-2 text-high-emphasis">SIM Details</h2>
             <VTable density="compact" class="text-body-2">
               <tbody>
                 <tr>
-                  <td class="pl-0">Condition</td>
+                  <td class="pl-0">SIM Condition</td>
                   <td>{{ auctionStore.auction?.productCondition }}</td>
                 </tr>
                 <tr>
-                  <td class="pl-0">Category</td>
+                  <td class="pl-0">SIM Category</td>
                   <td>{{ auctionStore.auction?.category }}</td>
                 </tr>
                 <tr>
@@ -80,7 +87,7 @@ const auctionStore = useAuctionStore();
 
           <!--Description-->
           <section v-if="auctionStore.auction?.productDescription" class="mt-4">
-            <h2 class="text-subtitle-2 text-high-emphasis">Description</h2>
+            <h2 class="text-subtitle-2 text-high-emphasis">SIM Description</h2>
             <p class="text-body-2">
               {{ auctionStore.auction?.productDescription }}
             </p>

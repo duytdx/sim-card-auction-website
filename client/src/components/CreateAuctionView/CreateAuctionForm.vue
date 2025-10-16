@@ -35,7 +35,10 @@ const duration = ref({
 
 const form = ref({
   error: null,
-  productConditions: ["New", "Used"],
+  productConditions: [
+    { title: "Unactivated (New)", value: "New" },
+    { title: "Pre-owned (Used)", value: "Used" },
+  ],
   categories: computed(() => categoriesStore.categories),
   cities: computed(() => citiesStore.cities),
 });
@@ -60,12 +63,12 @@ const validateImagesCount = () => {
 
   if (imagesCount < 1) {
     form.value.error = {
-      errorMessages: ["You have to upload 1 image at least."],
+      errorMessages: ["Upload at least one SIM image."],
     };
     return false;
   } else if (imagesCount > 10) {
     form.value.error = {
-      errorMessages: ["You have to upload 10 image at max."],
+      errorMessages: ["You can upload up to 10 SIM images."],
     };
     return false;
   }
@@ -101,7 +104,7 @@ onBeforeMount(async () => {
       <!--Title-->
       <div class="d-flex flex-column align-center align-md-start mb-4">
         <h1 class="text-h6 text-sm-h5 text-high-emphasis font-weight-bold">
-          Create Auction
+          Create SIM Auction
         </h1>
         <VDivider
           thickness="3"
@@ -116,22 +119,22 @@ onBeforeMount(async () => {
 
       <!--Details fields-->
       <VRow justify="space-between">
-        <!--Product details fields-->
+        <!--SIM details fields-->
         <VCol cols="12" md="6" class="pr-md-8">
           <span class="d-block text-subtitle-2 mb-3 text-high-emphasis">
-            Product details
+            SIM details
           </span>
 
-          <div class="text-caption text-medium-emphasis">Product Images</div>
+          <div class="text-caption text-medium-emphasis">SIM Images</div>
           <ImagePicker
             @picked-images-changed="updateProductImages"
             class="mb-5"
           />
 
-          <div class="text-caption text-medium-emphasis">Product Name</div>
+          <div class="text-caption text-medium-emphasis">SIM Number</div>
           <VTextField
             v-model="auction.productName"
-            placeholder="e.g., Vintage Camera"
+            placeholder="e.g., 0901 888 888"
             density="comfortable"
             variant="outlined"
             class="mb-1"
@@ -140,10 +143,10 @@ onBeforeMount(async () => {
             :rules="[inputRules.required, inputRules.minLength]"
           />
 
-          <div class="text-caption text-medium-emphasis">Description</div>
+          <div class="text-caption text-medium-emphasis">SIM Description</div>
           <VTextarea
             v-model="auction.productDescription"
-            placeholder="e.g., brand, specifications, unique features"
+            placeholder="e.g., carrier, activation status, bonus data"
             density="comfortable"
             variant="outlined"
             class="mb-1"
@@ -152,11 +155,13 @@ onBeforeMount(async () => {
             :rules="[inputRules.required, inputRules.minLength]"
           />
 
-          <div class="text-caption text-medium-emphasis">Condition</div>
+          <div class="text-caption text-medium-emphasis">SIM Condition</div>
           <VSelect
             v-model="auction.productCondition"
             :items="form.productConditions"
-            placeholder="Select condition"
+            item-title="title"
+            item-value="value"
+            placeholder="Select SIM condition"
             density="comfortable"
             variant="outlined"
             :rules="[inputRules.required]"

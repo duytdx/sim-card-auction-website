@@ -29,7 +29,7 @@ const {
       <div class="d-flex align-center ga-2 mb-3">
         <VIcon icon="mdi-star-four-points" :size="xs ? 'small' : 'default'" />
         <h1 :class="xs ? 'text-h6' : 'text-h5'">
-          <span class="font-weight-light">Latest</span> Auctions
+          <span class="font-weight-light">Latest</span> SIM Auctions
         </h1>
         <VSpacer />
         <AuctionFiltersDialog

@@ -4,6 +4,7 @@ import defaultProfilePicture from "@/assets/default-profile-sm.png";
 import { useNotificationsStore } from "@/stores/NotificationsStore";
 import { getDateDifference } from "@/utils/dateTimeUtils";
 import { formatBold } from "@/utils/stringUtils";
+import { resolveFileUrl } from "@/utils/urlUtils";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 
@@ -18,7 +19,8 @@ const router = useRouter();
 const notificationsStore = useNotificationsStore();
 
 const notificationThumbnail = computed(() => {
-  return props.notification?.thumbnailUrl ?? defaultProfilePicture;
+  const resolvedUrl = resolveFileUrl(props.notification?.thumbnailUrl);
+  return resolvedUrl || defaultProfilePicture;
 });
 
 const notificationMessage = computed(() => {

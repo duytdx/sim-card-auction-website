@@ -2,6 +2,7 @@
 import { useAuctionsStore } from "@/stores/AuctionsStore";
 import VueCountdown from "@chenfengyuan/vue-countdown";
 import { computed } from "vue";
+import { resolveFileUrl } from "@/utils/urlUtils";
 
 const props = defineProps({
   auction: {
@@ -22,6 +23,10 @@ const remainingTimeInMs = computed(() => {
 
 const isAuctionActive = computed(() => {
   return remainingTimeInMs.value > 0;
+});
+
+const thumbnailSrc = computed(() => {
+  return resolveFileUrl(props.auction?.thumbnailUrl);
 });
 
 const onAuctionEnded = () => {
@@ -53,8 +58,8 @@ const formatProps = (props) => {
     >
       <!--Thumbnail-->
       <VImg
-        :src="auction.thumbnailUrl"
-        alt="Product Image"
+        :src="thumbnailSrc"
+        alt="SIM image"
         aspect-ratio="1"
         color="#f0f0f0"
         cover
